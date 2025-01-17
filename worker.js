@@ -1,5 +1,5 @@
 // 在文件开头添加常量声明
-const MAX_FILE_SIZE = 98 * 1024 * 1024; // 文件大小限制 (98MB)
+const MAX_FILE_SIZE = 1024 * 1024 * 1024; // 文件大小限制 (98MB)
 const MAX_TOTAL_STORAGE = 6 * 1024 * 1024 * 1024; // 总存储限制 (6GB)
 
 // 工具函数
@@ -2943,9 +2943,9 @@ createApp({
   setup() {
     const activeTab = ref('paste');
     const content = ref('');
-    const isMarkdown = ref(true);
+    const isMarkdown = ref(false);
     const password = ref('');
-    const expiresIn = ref('1d');
+    const expiresIn = ref('30d');
     const files = ref([]);
     const isDragging = ref(false);
     const result = ref(null);
@@ -2981,7 +2981,7 @@ createApp({
     // 添加自动保存的状态和方法
     const lastSavedContent = ref(''); // 添加最后保存的内容
     const isFileEditing = ref(false);
-    const editFileExpiresIn = ref('1d');
+    const editFileExpiresIn = ref('30d');
     const editFileMaxViews = ref('0');
 
     // 在 setup() 函数中添加新的状态
