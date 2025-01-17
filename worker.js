@@ -3577,7 +3577,7 @@ createApp({
         
         result.value = {
           type: 'paste',
-          url: window.location.origin + '/share/paste/' + data.id,
+          url: window.location.origin + '/s/paste/' + data.id,
         };
         
         // 成功后立即刷新分享列表
@@ -3768,7 +3768,7 @@ createApp({
             result.value = {
                 type: 'files',
                 files: successFiles.map(file => ({
-                    url: window.location.origin + '/share/file/' + file.fileId,
+                    url: window.location.origin + '/s/file/' + file.fileId,
                     filename: file.filename,
                     directDownloadUrl: window.location.origin + '/download/' + file.fileId  // 直链
                 }))
@@ -3789,7 +3789,7 @@ createApp({
         result.value = {
             type: 'files',
             files: successFiles.map(file => ({
-                url: window.location.origin + '/share/file/' + file.fileId,
+                url: window.location.origin + '/s/file/' + file.fileId,
                 filename: file.filename,
                 directDownloadUrl: window.location.origin + '/download/' + file.fileId  // 直链
             }))
@@ -5485,7 +5485,7 @@ createApp({
         error.value = null;
         const pathParts = window.location.pathname.split('/');
         const id = pathParts[pathParts.length - 1];
-        const isFilePath = window.location.pathname.includes('/share/file/');
+        const isFilePath = window.location.pathname.includes('/s/file/');
         isFile.value = isFilePath;
         
         const apiUrl = isFilePath ? '/api/file/' + id : '/api/paste/' + id;
@@ -7242,7 +7242,7 @@ async function handleFile(request, env, ctx) {
               maxViews: parseInt(metadata.maxViews) || 0,
               viewCount: parseInt(metadata.viewCount) || 0,
               status: "success",
-              url: `${url.origin}/share/file/${fileId}`,
+              url: `${url.origin}/s/file/${fileId}`,
               directDownloadUrl: `${url.origin}/download/${fileId}`, // 添加直接下载链接
             }),
             {
@@ -7685,7 +7685,7 @@ export default {
                       expiresAt: paste.expiresAt,
                       hasPassword: !!paste.passwordHash,
                       isMarkdown: paste.isMarkdown,
-                      url: `${url.origin}/share/paste/${key.name}`,
+                      url: `${url.origin}/s/paste/${key.name}`,
                       maxViews: paste.maxViews || 0,
                       viewCount: paste.viewCount || 0,
                     };
@@ -7722,7 +7722,7 @@ export default {
                       createdAt: metadata.uploadedAt || object.uploaded,
                       expiresAt: metadata.expiresAt,
                       hasPassword: !!metadata.passwordHash,
-                      url: `${url.origin}/share/file/${object.key}`,
+                      url: `${url.origin}/s/file/${object.key}`,
                       directDownloadUrl: `${url.origin}/download/${object.key}`, // 添加直接下载链接
                       maxViews: parseInt(metadata.maxViews) || 0,
                       viewCount: parseInt(metadata.viewCount) || 0,
@@ -8214,7 +8214,7 @@ export default {
 
     if (url.pathname.match(/^\/file\/[a-zA-Z0-9]+$/)) {
       const id = url.pathname.split("/").pop();
-      return Response.redirect(`${url.origin}/share/file/${id}`, 301);
+      return Response.redirect(`${url.origin}/s/file/${id}`, 301);
     }
 
     // 添加直接下载路由
