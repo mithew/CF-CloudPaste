@@ -6815,7 +6815,7 @@ async function handleSimplePaste(request, env) {
   // 直接返回纯文本内容
   return new Response(paste.content, {
     headers: {
-      "Content-Type": "text/plain",
+      "Content-Type": "text/plain; charset=utf-8",
       "Access-Control-Allow-Origin": "*",
     },
   });
