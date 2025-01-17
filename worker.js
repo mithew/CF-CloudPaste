@@ -1,5 +1,5 @@
 // 在文件开头添加常量声明
-const MAX_FILE_SIZE = 1024 * 1024 * 1024; // 文件大小限制 (98MB)
+const MAX_FILE_SIZE = 1024 * 1024 * 1024; // 文件大小限制  
 const MAX_TOTAL_STORAGE = 6 * 1024 * 1024 * 1024; // 总存储限制 (6GB)
 
 // 工具函数
@@ -6773,7 +6773,7 @@ async function handlePaste(request, env) {
   }
 }
 
-// 新增函数：处理 /paste/:id 请求，返回纯文本或极简 HTML
+// 新增函数：处理 /paste/:id 请求，返回纯文本
 async function handleSimplePaste(request, env) {
   const url = new URL(request.url);
   const pathParts = url.pathname.split("/");
@@ -6812,53 +6812,15 @@ async function handleSimplePaste(request, env) {
     }
   }
 
-  const userAgent = request.headers.get("User-Agent");
-
-  // 根据 User-Agent 或 Accept 头部决定返回纯文本还是极简 HTML
-  if (
-    userAgent &&
-    (userAgent.includes("curl") ||
-      userAgent.includes("Wget") ||
-      userAgent.includes("fetch") ||
-      userAgent.includes("python-requests"))
-  ) {
-    // 如果是命令行工具或 Python 爬虫，返回纯文本
-    return new Response(paste.content, {
-      headers: {
-        "Content-Type": "text/plain",
-        "Access-Control-Allow-Origin": "",
-      },
-    });
-  } else {
-    // 否则返回极简 HTML
-    const simpleHtml = `
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Paste Content</title>
-    <style>
-        body {
-            font-family: monospace;
-            white-space: pre-wrap;
-        }
-    </style>
-</head>
-<body>
-${paste.content}
-</body>
-</html>
-    `;
-    return new Response(simpleHtml, {
-      headers: {
-        "Content-Type": "text/html",
-        "Access-Control-Allow-Origin": "",
-      },
-    });
-  }
+  // 直接返回纯文本内容
+  return new Response(paste.content, {
+    headers: {
+      "Content-Type": "text/plain",
+      "Access-Control-Allow-Origin": "*",
+    },
+  });
 }
-
+  
 // 处理文件上传和下载
 async function handleFile(request, env, ctx) {
   const url = new URL(request.url);
