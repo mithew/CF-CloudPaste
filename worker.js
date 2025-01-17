@@ -6611,10 +6611,12 @@ async function handlePaste(request, env) {
 
       await env.PASTE_STORE.put(id, JSON.stringify(paste));
 
+      const shareUrl = `${url.origin}/s/paste/${id}`; // 修改 /share/ 为 /s/
       return new Response(
         JSON.stringify({
           id,
           status: "success",
+          url: shareUrl, // 添加分享链接到返回结果
         }),
         {
           headers: { "Content-Type": "application/json" },
@@ -7096,7 +7098,7 @@ async function handleFile(request, env, ctx) {
               maxViews: metadata.maxViews, // 在返回结果中添加最大访问次数
               viewCount: 0,
               status: "success",
-              url: `${url.origin}/share/file/${id}`,
+              url: `${url.origin}/s/file/${id}`, // 修改 /share/ 为 /s/
               directDownloadUrl: `${url.origin}/download/${id}`, // 添加直接下载链接
             });
             hasSuccess = true;
@@ -8190,13 +8192,19 @@ export default {
     }
 
     // 处理分享页面
-    if (url.pathname.startsWith("/share/paste/") || url.pathname.startsWith("/share/file/")) {
+    if (url.pathname.startsWith("/s/paste/") || url.pathname.startsWith("/s/file/")) {
       return new Response(shareHtml, {
         headers: {
           "Content-Type": "text/html",
           "Access-Control-Allow-Origin": "*",
         },
       });
+    }
+
+    // (可选) 重定向旧的分享链接
+    if (url.pathname.startsWith("/share/paste/") || url.pathname.startsWith("/share/file/")) {
+      const newPath = url.pathname.replace("/share/", "/s/");
+      return Response.redirect(url.origin + newPath, 301);
     }
 
     // 重定向 API 直接访问到分享页面
