@@ -6773,6 +6773,92 @@ async function handlePaste(request, env) {
   }
 }
 
+// 新增函数：处理 /paste/:id 请求，返回纯文本或极简 HTML
+async function handleSimplePaste(request, env) {
+  const url = new URL(request.url);
+  const pathParts = url.pathname.split("/");
+  const pasteId = pathParts[pathParts.length - 1];
+
+  const storedPaste = await env.PASTE_STORE.get(pasteId);
+  if (!storedPaste) {
+    return new Response("Paste not found", {
+      status: 404,
+      headers: { "Content-Type": "text/plain" },
+    });
+  }
+
+  const paste = JSON.parse(storedPaste);
+
+  if (utils.isExpired(paste.expiresAt)) {
+    await env.PASTE_STORE.delete(pasteId);
+    return new Response("Paste has expired", {
+      status: 404,
+      headers: { "Content-Type": "text/plain" },
+    });
+  }
+
+  // 检查访问次数
+  if (paste.maxViews > 0) {
+    paste.viewCount = (paste.viewCount || 0) + 1;
+    await env.PASTE_STORE.put(pasteId, JSON.stringify(paste));
+
+    // 如果达到最大访问次数，删除分享并返回过期信息
+    if (paste.viewCount > paste.maxViews) {
+      await env.PASTE_STORE.delete(pasteId);
+      return new Response("Paste has reached maximum views", {
+        status: 404,
+        headers: { "Content-Type": "text/plain" },
+      });
+    }
+  }
+
+  const userAgent = request.headers.get("User-Agent");
+
+  // 根据 User-Agent 或 Accept 头部决定返回纯文本还是极简 HTML
+  if (
+    userAgent &&
+    (userAgent.includes("curl") ||
+      userAgent.includes("Wget") ||
+      userAgent.includes("fetch") ||
+      userAgent.includes("python-requests"))
+  ) {
+    // 如果是命令行工具或 Python 爬虫，返回纯文本
+    return new Response(paste.content, {
+      headers: {
+        "Content-Type": "text/plain",
+        "Access-Control-Allow-Origin": "",
+      },
+    });
+  } else {
+    // 否则返回极简 HTML
+    const simpleHtml = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paste Content</title>
+    <style>
+        body {
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+${paste.content}
+</body>
+</html>
+    `;
+    return new Response(simpleHtml, {
+      headers: {
+        "Content-Type": "text/html",
+        "Access-Control-Allow-Origin": "",
+      },
+    });
+  }
+}
+
 // 处理文件上传和下载
 async function handleFile(request, env, ctx) {
   const url = new URL(request.url);
@@ -8153,8 +8239,7 @@ export default {
 
     // 重定向 API 直接访问到分享页面
     if (url.pathname.match(/^\/paste\/[a-zA-Z0-9]+$/)) {
-      const id = url.pathname.split("/").pop();
-      return Response.redirect(`${url.origin}/share/paste/${id}`, 301);
+      return handleSimplePaste(request, env);
     }
 
     if (url.pathname.match(/^\/file\/[a-zA-Z0-9]+$/)) {
