@@ -7579,7 +7579,7 @@ export default {
       const now = new Date();
 
       // 如果没有上次清理记录，或者距离上次清理已经过去了至少1小时
-      if (!lastCleanup || now - new Date(lastCleanup) >= 60 * 60 * 1000) {
+      if (!lastCleanup || now - new Date(lastCleanup) >= 24 * 60 * 60 * 1000) {
         // 使用 waitUntil 确保清理操作在响应返回后继续执行
         ctx.waitUntil(
           (async () => {
