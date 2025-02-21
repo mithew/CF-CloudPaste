@@ -29,23 +29,18 @@ const utils = {
   },
 
   // 计算过期时间
-  calculateExpiryTime(duration) {
-    if (duration === "never") return null; // 永久不过期返回 null
-
-    const now = new Date();
-    switch (duration) {
-      case "1h":
-        return new Date(now.getTime() + 60 * 60 * 1000);
-      case "1d":
-        return new Date(now.getTime() + 24 * 60 * 60 * 1000);
-      case "7d":
-        return new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
-      case "30d":
-        return new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
-      default:
-        return new Date(now.getTime() + 24 * 60 * 60 * 1000);
-    }
-  },
+calculateExpiryTime(duration) {
+  if (duration === "never") return null;
+  const now = new Date();
+  switch (duration) {
+    case "1d":   // 1天
+      return new Date(now.getTime() + 24 * 60 * 60 * 1000);
+    case "3000d": // 3000天
+      return new Date(now.getTime() + 3000 * 24 * 60 * 60 * 1000);
+    default:     // 默认1天
+      return new Date(now.getTime() + 24 * 60 * 60 * 1000);
+  }
+},
 
   // 检查是否过期
   isExpired(expiryTime) {
@@ -2945,7 +2940,7 @@ createApp({
     const content = ref('');
     const isMarkdown = ref(false);
     const password = ref('');
-    const expiresIn = ref('30d');
+    const expiresIn = ref('1d');
     const files = ref([]);
     const isDragging = ref(false);
     const result = ref(null);
@@ -4666,11 +4661,9 @@ createApp({
         <div class="input-group">
             <label>过期时间</label>
             <select v-model="expiresIn">
-            <option value="1h">1小时</option>
-            <option value="1d">1天</option>
-            <option value="7d">7天</option>
-            <option value="30d">30天</option>
-            <option value="never">永不过期</option>
+              <option value="1d">1天（默认）</option>
+              <option value="3000d">3000天（约8年）</option>
+              <option value="never">永不过期</option>
             </select>
         </div>
         <div class="input-group">
@@ -4771,10 +4764,8 @@ createApp({
           <div class="input-group">
             <label>过期时间</label>
             <select v-model="expiresIn">
-              <option value="1h">1小时</option>
-              <option value="1d">1天</option>
-              <option value="7d">7天</option>
-              <option value="30d">30天</option>
+              <option value="1d">1天（默认）</option>
+              <option value="3000d">3000天（约8年）</option>
               <option value="never">永不过期</option>
             </select>
           </div>
@@ -6283,10 +6274,8 @@ const shareHtml = `<!DOCTYPE html>
                     <div class="input-group">
                       <label>过期时间</label>
                       <select v-model="editFileExpiresIn" class="form-select">
-                        <option value="1h">1小时</option>
-                        <option value="1d">1天</option>
-                        <option value="7d">7天</option>
-                        <option value="30d">30天</option>
+                        <option value="1d">1天（默认）</option>
+                        <option value="3000d">3000天（约8年）</option>
                         <option value="never">永不过期</option>
                       </select>
                     </div>
@@ -6392,10 +6381,8 @@ const shareHtml = `<!DOCTYPE html>
                       <div class="input-group">
                         <label>过期时间</label>
                         <select v-model="editExpiresIn" class="form-select">
-                          <option value="1h">1小时</option>
-                          <option value="1d">1天</option>
-                          <option value="7d">7天</option>
-                          <option value="30d">30天</option>
+                          <option value="1d">1天（默认）</option>
+                          <option value="3000d">3000天（约8年）</option>
                           <option value="never">永不过期</option>
                         </select>
                       </div>
